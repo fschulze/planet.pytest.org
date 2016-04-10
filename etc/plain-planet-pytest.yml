@@ -62,3 +62,9 @@
         dest: /etc/nginx/sites-available/default
         src: ../nginx.conf
       notify: reload nginx
+    - name: cronjob for feed update
+      cron:
+        name: planet-feed-update
+        user: pytest
+        minute: 0
+        job: /home/pytest/planet.pytest.org/update.sh
