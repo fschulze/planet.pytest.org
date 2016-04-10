@@ -1,0 +1,10 @@
+[Planet]
+name            = Planet Pytest
+link            = http://planet.pytest.org/
+owner_name      = Pytest Team
+owner_email     = pytest-dev@python.org
+output_theme    = /home/pytest/planet.pytest.org/theme
+output_dir      = /home/pytest/www/
+cache_directory = /home/pytest/planet.pytest.org/cache
+items_per_page  = 15
+future_dates    = ignore_date
