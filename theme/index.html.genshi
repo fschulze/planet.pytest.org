@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/">
+<head>
+<title>$feed.config.name</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="generator" content="$feed.generator"/>
+<link rel="stylesheet" href="http://pytest.org/latest/_static/flasky.css" type="text/css"/>
+<link py:for="link in feed.links"
+  py:if="link.type in ['application/atom+xml','application/rss+xml']"
+  href="$link.href" rel="alternate" title="$link.title" type="$link.type"/>
+<link rel="shortcut icon" href="http://pytest.org/latest/_static/pytest1favi.ico"/>
+</head>
+<body>
+<div class="indexwrapper">
+    <div class="document">
+        <div class="documentwrapper">
+            <div class="bodywrapper">
+                <div class="body">
+                    <div class="section">
+                        <h1>$feed.config.name</h1>
+
+                        <py:for each="entry in entries">
+
+                        <div class="channelgroup" py:strip="not entry.new_date">
+                        <h2 py:if="entry.new_date">$entry.new_date</h2>
+
+                        <div class="entrygroup" py:strip="not entry.new_feed">
+                        <h3 py:if="entry.new_feed"><a href="$entry.link" title="$entry.source.title">$entry.source.config.name</a></h3>
+
+                        <img py:if="entry.new_feed and entry.source.config.face" class="face" src="images/$entry.source.config.face" width="$entry.source.config.facewidth" height="$entry.source.config.faceheight" alt=""/>
+
+                        <h4 py:if="entry.title" lang="$entry.title_detail.language"><a href="$entry.link">$entry.title_detail.stream</a></h4>
+
+                        <div class="entry">
+                        <div class="content" py:choose="">
+                        <py:when test="entry.content">${entry.content[0].stream}</py:when>
+                        <py:when test="entry.summary_detail">${entry.summary_detail.stream}</py:when>
+                        </div>
+
+                        <p class="date"><py:if test="entry.author_detail and entry.author_detail.name">by $entry.author_detail.name at </py:if>$entry.updated</p>
+                        </div>
+
+                        </div>
+                        </div>
+
+                        </py:for>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sphinxsidebar">
+            <img src="http://pytest.org/latest/_static/pytest1.png" width="136" height="136" alt="Pytest Logo"/>
+
+            <p>
+            <strong>Last updated:</strong><br/>
+            $feed.updated<br/>
+            <em>All times are UTC.</em><br/>
+            <br/>
+            Powered by:<br/>
+            <a href="http://intertwingly.net/code/venus/">Planet Venus</a>
+            </p>
+        </div>
+        <div class="clearer"></div>
+    </div>
+    <div class="footer"></div>
+</div>
+</body>
+</html>
