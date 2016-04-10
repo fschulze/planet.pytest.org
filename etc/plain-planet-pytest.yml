@@ -1,0 +1,64 @@
+- hosts: plain-planet-pytest
+  user: root
+  handlers:
+    - name: reload nginx
+      service:
+        name: nginx
+        state: reloaded
+  tasks:
+    - name: Authorized keys
+      authorized_key:
+        user: root
+        key: "{{ lookup('file', playbook_dir + '/ssh/fschulze.pub') + '\n' + lookup('file', playbook_dir + '/ssh/hpk.pub') }}"
+        exclusive: yes
+    - name: Ensure packages are installed
+      apt:
+        name: "{{ item }}"
+        state: "present"
+      with_items:
+        - libxml2-dev
+        - libxslt-dev
+        - nginx
+        - python-dev
+        - python-pip
+        - python-virtualenv
+        - xsltproc
+        - zlib1g-dev
+    - name: Setup pytest group
+      group:
+        name: pytest
+    - name: Setup pytest user
+      user:
+        name: pytest
+        group: pytest
+    - name: clone venus repository
+      become: yes
+      become_user: pytest
+      git:
+        repo: https://github.com/rubys/venus.git
+        dest: /home/pytest/venus
+        version: 9de21094a8cf565bdfcf75688e121a5ad1f5397b
+    - name: clone planet.pytest.org repository
+      become: yes
+      become_user: pytest
+      git:
+        repo: https://github.com/fschulze/planet.pytest.org.git
+        dest: /home/pytest/planet.pytest.org
+    - name: setup planet.pytest.org directory mode
+      file:
+        path: /home/pytest/planet.pytest.org
+        state: directory
+        owner: "pytest"
+        group: "pytest"
+        mode: "0700"
+    - name: install python packages in planet.pytest.org
+      become: yes
+      become_user: pytest
+      pip:
+        requirements: /home/pytest/planet.pytest.org/venus-requirements.txt
+        virtualenv: /home/pytest/planet.pytest.org
+    - name: nginx config
+      copy:
+        dest: /etc/nginx/sites-available/default
+        src: ../nginx.conf
+      notify: reload nginx
