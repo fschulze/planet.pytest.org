@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/">
+<head>
+<title><TMPL_VAR name></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="generator" content="<TMPL_VAR generator ESCAPE="HTML">">
+<link rel="stylesheet" href="http://pytest.org/latest/_static/flasky.css" type="text/css"/>
+<TMPL_IF feedtype>
+<link rel="alternate" href="<TMPL_VAR feed ESCAPE="HTML">" title="<TMPL_VAR channel_title_plain ESCAPE="HTML">" type="application/<TMPL_VAR feedtype>+xml">
+</TMPL_IF>
+<link rel="shortcut icon" href="http://pytest.org/latest/_static/pytest1favi.ico"/>
+</head>
+<body>
+<div class="indexwrapper">
+    <div class="document">
+        <div class="documentwrapper">
+            <div class="bodywrapper">
+                <div class="body">
+                    <div class="section">
+                        <h1><TMPL_VAR name></h1>
+
+                        <TMPL_LOOP Items>
+
+                        <TMPL_IF new_date>
+                        <TMPL_UNLESS __FIRST__>
+                        ### End <div class="channelgroup">
+                        </div>
+                        ### End <div class="daygroup">
+                        </div>
+                        </TMPL_UNLESS>
+                        <div class="daygroup">
+                        <h2><TMPL_VAR new_date></h2>
+                        </TMPL_IF>
+
+                        <TMPL_IF new_channel>
+                        <TMPL_UNLESS new_date>
+                        ### End <div class="channelgroup">
+                        </div>
+                        </TMPL_UNLESS>
+                        <div class="channelgroup">
+
+                        <h3><a href="<TMPL_VAR channel_link ESCAPE="HTML">" title="<TMPL_VAR channel_title_plain ESCAPE="HTML">"><TMPL_VAR channel_name></a></h3>
+                        <TMPL_IF channel_face>
+                        <img class="face" src="images/<TMPL_VAR channel_face ESCAPE="HTML">" width="<TMPL_VAR channel_facewidth ESCAPE="HTML">" height="<TMPL_VAR channel_faceheight ESCAPE="HTML">" alt="">
+                        </TMPL_IF>
+                        </TMPL_IF>
+
+                        <div class="entrygroup" id="<TMPL_VAR id>"<TMPL_IF channel_language> lang="<TMPL_VAR channel_language>"</TMPL_IF>>
+                        <TMPL_IF title>
+                        <h4<TMPL_IF title_language> lang="<TMPL_VAR title_language>"</TMPL_IF>><a href="<TMPL_VAR link ESCAPE="HTML">"><TMPL_VAR title></a></h4>
+                        </TMPL_IF>
+                        <div class="entry">
+                        <div class="content"<TMPL_IF content_language> lang="<TMPL_VAR content_language>"</TMPL_IF>>
+                        <TMPL_VAR content>
+                        </div>
+
+                        <p class="date">
+                        <a href="<TMPL_VAR link ESCAPE="HTML">"><TMPL_IF author>by <TMPL_VAR author ESCAPE="HTML"> at </TMPL_IF><TMPL_VAR date><TMPL_IF category> under <TMPL_VAR category></TMPL_IF></a>
+                        </p>
+                        </div>
+                        </div>
+
+                        <TMPL_IF __LAST__>
+                        ### End <div class="channelgroup">
+                        </div>
+                        ### End <div class="daygroup">
+                        </div>
+                        </TMPL_IF>
+
+                        </TMPL_LOOP>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sphinxsidebar">
+            <img src="http://pytest.org/latest/_static/pytest1.png" width="136" height="136" alt="Pytest Logo"/>
+
+            <p>
+            <strong>Last updated:</strong><br/>
+            <TMPL_VAR date><br/>
+            <em>All times are UTC.</em><br/>
+            <br/>
+            Powered by:<br/>
+            <a href="http://intertwingly.net/code/venus/">Planet Venus</a>
+            </p>
+
+            <h2>Subscriptions</h2>
+            <ul>
+            <TMPL_LOOP Channels>
+            <li>
+            <a href="<TMPL_VAR url ESCAPE="HTML">" title="subscribe"><img src="feed-icon-10x10.png" alt="(feed)"></a> <a <TMPL_IF link>href="<TMPL_VAR link ESCAPE="HTML">" </TMPL_IF><TMPL_IF message>class="message" title="<TMPL_VAR message ESCAPE="HTML">"</TMPL_IF><TMPL_UNLESS message>title="<TMPL_VAR title_plain ESCAPE="HTML">"</TMPL_UNLESS>><TMPL_VAR name></a>
+            </li>
+            </TMPL_LOOP>
+            </ul>
+        </div>
+        <div class="clearer"></div>
+    </div>
+    <div class="footer"></div>
+</div>
+</body>
+</html>

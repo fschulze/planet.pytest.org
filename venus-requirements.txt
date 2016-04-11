@@ -5,5 +5,4 @@
 #    pip-compile --no-index --output-file venus-requirements.txt venus-requirements.in
 #
 
-genshi==0.6
 lxml==3.6.0
