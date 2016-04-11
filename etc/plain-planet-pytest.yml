@@ -68,3 +68,7 @@
         user: pytest
         minute: 0
         job: /home/pytest/planet.pytest.org/update.sh
+    - name: copy feed icon
+      command: cp /home/pytest/venus/themes/common/images/feed-icon-10x10.png /home/pytest/www/feed-icon-10x10.png
+      args:
+        creates: /home/pytest/www/feed-icon-10x10.png
