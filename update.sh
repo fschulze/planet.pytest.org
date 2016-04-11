@@ -1,5 +1,5 @@
 #!/bin/sh
-set -x
+set -e
 cd /home/pytest/planet.pytest.org
 /usr/bin/git pull
 cat config.ini.top feeds.cfg > config.ini
