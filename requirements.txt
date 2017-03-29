@@ -13,6 +13,7 @@ execnet==1.4.1            # via ploy-ansible
 first==2.0.1              # via pip-tools
 jinja2==2.8               # via ansible
 lazy==1.2                 # via ploy
+keyring==10.3.1
 MarkupSafe==0.23          # via jinja2
 paramiko==1.16.0          # via ansible, ploy
 pip-tools==1.6.1

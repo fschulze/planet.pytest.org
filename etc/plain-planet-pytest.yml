@@ -1,10 +1,12 @@
 - hosts: plain-planet-pytest
   user: root
-  handlers:
-    - name: reload nginx
-      service:
-        name: nginx
-        state: reloaded
+  roles:
+    - {role: certbot, tags: certbot}
+    - {role: nginx, tags: nginx}
+  vars:
+    certbot_domains:
+      - docs.pytest.org
+    nginx_conf_content: "{{ lookup('template', playbook_dir +'/../nginx.conf') }}"
   tasks:
     - name: Authorized keys
       authorized_key:
@@ -18,7 +20,6 @@
       with_items:
         - libxml2-dev
         - libxslt-dev
-        - nginx
         - python-dev
         - python-pip
         - python-virtualenv
@@ -57,11 +58,6 @@
       pip:
         requirements: /home/pytest/planet.pytest.org/venus-requirements.txt
         virtualenv: /home/pytest/planet.pytest.org
-    - name: nginx config
-      copy:
-        dest: /etc/nginx/sites-available/default
-        src: ../nginx.conf
-      notify: reload nginx
     - name: cronjob for feed update
       cron:
         name: planet-feed-update

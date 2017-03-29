@@ -1,3 +1,4 @@
+keyring
 pip>=8.1
 pip-tools
 ploy

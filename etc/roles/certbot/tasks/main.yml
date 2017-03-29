@@ -1,0 +1,143 @@
+---
+- name: Ensure packages are installed
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - build-essential
+    - dialog
+    - libffi-dev
+    - libssl-dev
+    - python-dev
+    - python-virtualenv
+- name: Setup certbot group
+  group:
+    name: certbot
+- name: Setup certbot user
+  user:
+    name: certbot
+    group: certbot
+- name: letsencrypt directories
+  file:
+    path: "{{ item }}"
+    owner: certbot
+    group: certbot
+    mode: "0750"
+    state: directory
+  with_items:
+    - /var/lib/letsencrypt
+    - /var/log/letsencrypt
+- name: letsencrypt web directories
+  file:
+    path: "{{ item }}"
+    owner: certbot
+    group: www-data
+    mode: "0750"
+    state: directory
+  with_items:
+    - /etc/letsencrypt
+    - /var/www/html/letsencrypt
+- name: letsencrypt accounts directories
+  file:
+    path: "{{ item }}"
+    owner: certbot
+    group: certbot
+    mode: "0700"
+    state: directory
+  with_items:
+    - /etc/letsencrypt/accounts
+    - /etc/letsencrypt/accounts/acme-v01.api.letsencrypt.org
+    - /etc/letsencrypt/accounts/acme-v01.api.letsencrypt.org/directory
+    - /etc/letsencrypt/accounts/acme-v01.api.letsencrypt.org/directory/c8167fdcd858dbd6dd93f666024ac241
+- name: letsencrypt domain directories
+  file:
+    path: "{{ item }}"
+    owner: certbot
+    group: certbot
+    mode: "0755"
+    state: directory
+  with_items:
+    - /etc/letsencrypt/archive
+    - /etc/letsencrypt/renewal
+- name: letsencrypt domain directories
+  file:
+    path: "/etc/letsencrypt/{{ item[0] }}/{{ item[1] }}"
+    owner: certbot
+    group: certbot
+    mode: "0755"
+    state: directory
+  with_nested:
+    - [ 'archive', 'live' ]
+    - "{{ certbot_domains }}"
+- name: letsencrypt devpi account files
+  copy:
+    content: "{{ lookup('ploy_crypted', 'c8167fdcd858dbd6dd93f666024ac241/%s' % item) }}"
+    dest: "/etc/letsencrypt/accounts/acme-v01.api.letsencrypt.org/directory/c8167fdcd858dbd6dd93f666024ac241/{{ item }}"
+    owner: certbot
+    group: certbot
+    mode: "0664"
+  with_items:
+    - meta.json
+    - regr.json
+- name: letsencrypt devpi account key
+  copy:
+    content: "{{ lookup('ploy_crypted', 'c8167fdcd858dbd6dd93f666024ac241/private_key.json') }}"
+    dest: /etc/letsencrypt/accounts/acme-v01.api.letsencrypt.org/directory/c8167fdcd858dbd6dd93f666024ac241/private_key.json
+    owner: certbot
+    group: certbot
+    mode: "0400"
+- name: letsencrypt domain data
+  copy:
+    content: "{{ lookup('ploy_crypted', '%s/%s' % (item[0], item[1])) }}"
+    dest: "/etc/letsencrypt/archive/{{ item[0] }}/{{ item[1] }}"
+    owner: certbot
+    group: certbot
+    mode: "0644"
+  with_nested:
+    - "{{ certbot_domains }}"
+    - [ 'cert1.pem', 'chain1.pem', 'fullchain1.pem', 'privkey1.pem' ]
+- name: letsencrypt domain live links
+  command: "ln -s ../../archive/{{ item[0] }}/{{ item[1] }}1.pem /etc/letsencrypt/live/{{ item[0] }}/{{ item[1] }}.pem"
+  args:
+    creates: "/etc/letsencrypt/live/{{ item[0] }}/{{ item[1] }}.pem"
+  with_nested:
+    - "{{ certbot_domains }}"
+    - [ 'cert', 'chain', 'fullchain', 'privkey' ]
+- name: letsencrypt renewal info
+  copy:
+    src: "renewal/{{ item }}.conf"
+    dest: "/etc/letsencrypt/renewal/{{ item }}.conf"
+    owner: certbot
+    group: certbot
+    mode: "0644"
+  with_items: "{{ certbot_domains }}"
+- name: certbot directory
+  file:
+    path: /home/certbot/certbot
+    owner: certbot
+    group: certbot
+    state: directory
+- name: certbot requirements.txt
+  copy:
+    dest: /home/certbot/certbot/requirements.txt
+    owner: certbot
+    group: certbot
+    content: |
+      certbot
+- name: install python packages in certbot
+  become: yes
+  become_user: certbot
+  pip:
+    requirements: /home/certbot/certbot/requirements.txt
+    virtualenv: /home/certbot/certbot
+- name: certbot renewal
+  cron:
+    name: certbot renewal
+    user: certbot
+    special_time: weekly
+    job: /home/certbot/certbot/bin/certbot renew --webroot -w /var/www/html/letsencrypt
+- name: nginx reload
+  cron:
+    name: nginx reload
+    special_time: weekly
+    job: /usr/sbin/service nginx reload
