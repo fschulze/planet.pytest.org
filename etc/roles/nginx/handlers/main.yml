@@ -1,5 +1,3 @@
 ---
 - name: reload nginx
-  service:
-    name: nginx
-    state: reloaded
+  shell: "if /usr/sbin/nginx -t; then kill -HUP `/var/run/nginx.pid` || service nginx restart; fi"

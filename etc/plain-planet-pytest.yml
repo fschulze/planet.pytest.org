@@ -5,6 +5,7 @@
     - {role: nginx, tags: nginx}
   vars:
     certbot_domains:
+      - autocrypt.org
       - docs.pytest.org
     nginx_conf_content: "{{ lookup('template', playbook_dir +'/../nginx.conf') }}"
   tasks:
